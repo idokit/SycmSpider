@@ -4,11 +4,7 @@ import datetime
 import scrapy
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import Request, signals
-from selenium import webdriver
-from sycm.page.NewLogin import NewLogin
-from sycm.dto.Dto import Dto
 from sycm.dto.ConfigData import ConfigData
-from sycm.entity.TaskProgress import TaskProgress
 
 
 class CompeletionSpider(scrapy.Spider):
@@ -18,23 +14,10 @@ class CompeletionSpider(scrapy.Spider):
     db_address = "mysql+mysqlconnector://root:123456@localhost:3306/test"
 
     def __init__(self, *args, **kwargs):
-        # TODO 爬虫初始化
         super(CompeletionSpider, self).__init__(*args, **kwargs)
         dispatcher.connect(self.closeSpider, signals.spider_closed)
-        options = webdriver.ChromeOptions()
-        options.add_argument(r"user-data-dir=C:\Users\zhouyi\AppData\Local\Google\Chrome\User Data")
-        options.add_argument('--headless')
-        options.add_argument('--disable-gpu')
-        driver = webdriver.Chrome("C:\crawl\chromedriver", 0, options)
-        # TODO 爬虫登录
-        browser = NewLogin(driver=driver)
-        browser.login()
-        self.browser = browser
-        self.db = Dto(self.db_address)
-        pass
 
     def start_requests(self):
-        # TODO url拼接
         yesterday = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")
         cates = ConfigData().getFullCate()
         cates = filter(lambda v: v['depth'] == 1, cates)
@@ -55,7 +38,9 @@ class CompeletionSpider(scrapy.Spider):
 
     def parse(self, response):
         print('done----------------------------')
+        pass
 
     def closeSpider(self, spider):
-        self.browser.driver.quit()
-        self.db.close()
+        # self.browser.driver.quit()
+        # self.db.close()
+        pass
