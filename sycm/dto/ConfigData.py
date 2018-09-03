@@ -231,31 +231,31 @@ class ConfigData(object):
             return None
 
     @staticmethod
-    def cateField(selection, crawl_date, dateType, devcice, seller):
+    def cateField(*, cate, crawl_date, dateType, devcice, seller, **kwarg):
         cate_filed_tr = []
         cate_filed_tb = []
         data_key = []
-        if not selection['itemName']:
-            dataConfig_logger.error("获取字段名失败" + str(selection))
+        if not cate['itemName']:
+            dataConfig_logger.error("获取字段名失败" + str(cate))
             return None
         cate_filed_tr.append('一级类目')
         data_key.append(DateType[dateType].value)
-        data_key.append(selection['itemName'])
-        cate_filed_tb.append(selection['itemName'])
-        if selection['depth'] > 1:
+        data_key.append(cate['itemName'])
+        cate_filed_tb.append(cate['itemName'])
+        if cate['depth'] > 1:
             cate_filed_tr.append('二级类目')
-            cate_filed_tb.append(selection['subcate']['itemName'])
-            data_key.append(selection['subcate']['itemName'])
-        if selection['depth'] > 2:
+            cate_filed_tb.append(cate['subcate']['itemName'])
+            data_key.append(cate['subcate']['itemName'])
+        if cate['depth'] > 2:
             cate_filed_tr.append('三级类目')
-            cate_filed_tb.append(selection['subcate']['subcate']['itemName'])
-            data_key.append(selection['subcate']['subcate']['itemName'])
+            cate_filed_tb.append(cate['subcate']['subcate']['itemName'])
+            data_key.append(cate['subcate']['subcate']['itemName'])
         cate_filed_tr.append('类目层级')
-        if selection['depth'] == 1:
+        if cate['depth'] == 1:
             cate_filed_tb.append('一级')
-        if selection['depth'] == 2:
+        if cate['depth'] == 2:
             cate_filed_tb.append('二级')
-        if selection['depth'] == 3:
+        if cate['depth'] == 3:
             cate_filed_tb.append('三级')
         cate_filed_tr.append('日期')
         cate_filed_tr.append('周期')

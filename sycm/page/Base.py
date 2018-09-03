@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
-    def __init__(self, driver,  **kwargs):
+    def __init__(self, driver, request=None,db=None,**kwargs):
         self.driver = driver
+        self.request = request
+        self.db = db
 
     def on_page(self, pagetitle):
         return pagetitle in self.driver.title
-
-
 
     def find_element(self, *loc):
         try:
@@ -37,7 +37,7 @@ class Base(object):
 
     def quick_find_element(self, *loc):
         try:
-            ele = WebDriverWait(self.driver, 3).until(EC.presence_of_element_located(loc))
+            ele = WebDriverWait(self.driver, 2).until(EC.presence_of_element_located(loc))
             self.script("window.scroll(0,%r-window.innerHeight)" % ele.location["y"])
             return ele
         except TimeoutError as e:

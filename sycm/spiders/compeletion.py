@@ -5,6 +5,7 @@ import scrapy
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import Request, signals
 from sycm.dto.ConfigData import ConfigData
+from sycm.dto.Dto import Dto
 
 
 class CompeletionSpider(scrapy.Spider):
@@ -20,13 +21,17 @@ class CompeletionSpider(scrapy.Spider):
     def start_requests(self):
         yesterday = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")
         cates = ConfigData().getFullCate()
-        cates = filter(lambda v: v['depth'] == 1, cates)
-        for device in [0]:
-            for dateType in ['recent1']:
+        for device in [0, 2]:
+            # 周期类型
+            for dateType in ['day']:
+                # 类目
                 for cate in cates:
+                    # 终端
                     for seller in [-1, 1]:
                         cateId = ConfigData.getCateId(cate)
-                        url = "https://sycm.taobao.com/mq/industry/overview/overview.htm?cateId={}&dateRange={}&dateType={}&device={}&seller={}".format(
+                        '?&cateId=1801&dateRange=2018-09-02%7C2018-09-02&dateType=day&device=0&parentCateId=0&sellerType=1'
+                        # 市场大盘
+                        url = "https://sycm.taobao.com/mc/mq/overview?cateFlag=0&cateId={}&dateRange={}&dateType={}&device={}&sellerType={}".format(
                             cateId, yesterday + "%7c" + yesterday, dateType, device, seller)
                         yield Request(url, meta={
                             'cate': cate,
@@ -37,10 +42,7 @@ class CompeletionSpider(scrapy.Spider):
                         }, callback=self.parse)
 
     def parse(self, response):
-        print('done----------------------------')
         pass
 
     def closeSpider(self, spider):
-        # self.browser.driver.quit()
-        # self.db.close()
         pass

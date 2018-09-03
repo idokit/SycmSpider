@@ -1,9 +1,11 @@
 import re
 import time
 from selenium.webdriver.common.by import By
-from sycm.page.Login import Login
 
-class Page(Login):
+from sycm.page.Base import Base
+
+
+class Page(Base):
     # 子交易排行
     sub_trade_tr = (By.CSS_SELECTOR, ".mod-child-cate-rank table thead th")
     sub_trade_tb = (By.CSS_SELECTOR, ".mod-child-cate-rank table tbody td")
@@ -51,27 +53,10 @@ class Page(Login):
 
     def sub_trade_process(self):
         pass
-        # for tb_val in sub_trade_tb:
-        #     json_str = json.dumps(dict(zip(
-        #                                     list(map(lambda v: v.text, sub_trade_tr)) + common_tr,
-        #                                    list(map(lambda v, y: y == 2 and v.get_attribute('value') or v.text, tb_val,
-        #                                             range(len(sub_trade_tr)))) + common_tb)),
-        #                           ensure_ascii=False)
-        #     spider.db.add(DataSource(**{
-        #         'shop_name': '宝洁官方旗舰店',
-        #         'data_type': self.data_type[0],
-        #         'data_key': '^_^'.join(data_key + [tb_val[0].text]),
-        #         'value': json_str,
-        #         'pt_name': '生意参谋',
-        #         'start_time': datetime.datetime.strptime(crawl_date, "%Y-%m-%d"),
-        #         'end_time': datetime.datetime.strptime(crawl_date, "%Y-%m-%d") + datetime.timedelta(1),
-        #         'gmt_create': datetime.datetime.now()
-        #     }))
-        # spider.db.commit()
 
-    def parse_page(self,request):
-        self.driver.get(request.url)
-        self.driver.refresh()
+    def parse_page(self):
+        self.driver.get(self.request.url)
+        # self.driver.refresh()
         # common_tr, common_tb, data_key = ConfigData.cateField(selection, crawl_date, dateType, devcice, seller)
         sub_trade_tr = self.find_elements(*self.sub_trade_tr)
         sub_trade_tb = self.find_elements(*self.sub_trade_tb)

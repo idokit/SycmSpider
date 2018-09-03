@@ -29,7 +29,7 @@ class Login(Base):
         super(Login, self).__init__(*args, **kw)
 
     def login(self):
-        self.driver.open(self.__baseUrl)
+        self.driver.get(self.__baseUrl)
         try:
             self.script("document.querySelector('#J_Static2Quick').click()")
         except Exception as e:
@@ -49,6 +49,7 @@ class Login(Base):
             count += 1
         self.__find_dialog()
         time.sleep(1)
+        return self.driver
 
     def __a_market_click(self):
         self.find_element(*self.__a_market).click()

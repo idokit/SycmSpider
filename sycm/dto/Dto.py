@@ -1,5 +1,9 @@
-from sqlalchemy import create_engine, select
+import datetime
+
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from sycm.entity.DataSource import DataSource
 
 
 class Dto():
@@ -18,18 +22,18 @@ class Dto():
 
     def query(self, *args, **kw):
         return self._session.query(*args, **kw)
-    # def to_data_base(self,data_type,tb,tr):
-    #     for item in data:
-    #         for tb_val in item.tb:
-    #             spider.db.add(DataSource(**{
-    #                 'shop_name': '宝洁',
-    #                 'data_type': item.name,
-    #                 'data_key': 'data_key',
-    #                 'value': json.dumps(dict(zip(map(lambda v: v.text, item.tr), map(lambda v: v.text, tb_val))),
-    #                                     ensure_ascii=False),
-    #                 'pt_name': '平台名',
-    #                 'start_time': crawl_date,
-    #                 'end_time': crawl_date + datetime.timedelta(1),
-    #                 'gmt_create': datetime.datetime.now()
-    #             }))
-    #     spider.db.commit()
+
+    def data_process(self, shop_name, data_type, data_key, value, pt_name, start_time, end_time):
+        self.add(
+            DataSource(**{
+                'shop_name': shop_name,
+                'data_type': data_type,
+                'data_key': data_key,
+                'value': value,
+                'pt_name': pt_name,
+                'start_time': datetime.datetime.strptime(start_time, "%Y-%m-%d"),
+                'end_time': datetime.datetime.strptime(end_time, "%Y-%m-%d"),
+                'gmt_create': datetime.datetime.now()
+            })
+        )
+        self.commit()
