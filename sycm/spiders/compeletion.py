@@ -29,7 +29,6 @@ class CompeletionSpider(scrapy.Spider):
                     # 终端
                     for seller in [-1, 1]:
                         cateId = ConfigData.getCateId(cate)
-                        '?&cateId=1801&dateRange=2018-09-02%7C2018-09-02&dateType=day&device=0&parentCateId=0&sellerType=1'
                         # 市场大盘
                         url = "https://sycm.taobao.com/mc/mq/overview?cateFlag=0&cateId={}&dateRange={}&dateType={}&device={}&sellerType={}".format(
                             cateId, yesterday + "%7c" + yesterday, dateType, device, seller)
@@ -38,7 +37,7 @@ class CompeletionSpider(scrapy.Spider):
                             'seller': seller,
                             'crawl_date': yesterday,
                             'devcice': device,
-                            'dateType': dateType
+                            'dateType': dateType,
                         }, callback=self.parse)
 
     def parse(self, response):

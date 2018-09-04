@@ -29,7 +29,7 @@ class OverviewMiddlewares(object):
     def process_request(self, request, spider):
         if True:
             Page = importlib.import_module('sycm.page.MarketOverview').Page
-        page = Page(driver=self.driver, request=request,db=self.db)
+        page = Page(driver=self.driver, request=request, db=self.db)
         page.parse_page()
         return HtmlResponse(url=request.url, encoding="UTF-8",
                             request=request)
