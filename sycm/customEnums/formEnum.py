@@ -17,7 +17,7 @@ class ShopType(Enum):
 class DateType(Enum):
     day = "天"
     month = "月"
-    range = "月"
+    range = "自定义"
     recent1 = "最近一天"
 
 

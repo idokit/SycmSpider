@@ -28,7 +28,7 @@ class Dto():
             DataSource(**{
                 'shop_name': shop_name,
                 'data_type': data_type,
-                'data_key': data_key,
+                'data_key': '^_^'.join(data_key),
                 'value': value,
                 'pt_name': pt_name,
                 'start_time': datetime.datetime.strptime(start_time, "%Y-%m-%d"),

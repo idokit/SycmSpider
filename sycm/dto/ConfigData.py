@@ -231,7 +231,7 @@ class ConfigData(object):
             return None
 
     @staticmethod
-    def cateField(*, cate, crawl_date, dateType, devcice, seller, **kwarg):
+    def cateField(*, cate, start_time,end_time, dateType, devcice, seller, **kwarg):
         cate_filed_tr = []
         cate_filed_tb = []
         data_key = []
@@ -257,14 +257,13 @@ class ConfigData(object):
             cate_filed_tb.append('二级')
         if cate['depth'] == 3:
             cate_filed_tb.append('三级')
-        cate_filed_tr.append('日期')
+        cate_filed_tr.append('开始日期')
+        cate_filed_tr.append('结束日期')
         cate_filed_tr.append('周期')
         cate_filed_tr.append('终端')
         cate_filed_tr.append('店铺类型')
-        if dateType == 'day' or 'recent1':
-            cate_filed_tb.append(str(crawl_date))
-        elif dateType == 'month' or 'range':
-            cate_filed_tb.append(str(crawl_date[0]))
+        cate_filed_tb.append(start_time)
+        cate_filed_tb.append(end_time)
         cate_filed_tb.append(DateType[dateType].value)
         cate_filed_tb.append(DeviceType.getNameFromValue(devcice))
         cate_filed_tb.append(ShopType.getNameFromValue(seller))
