@@ -25,7 +25,7 @@ class DeviceType(Enum):
     # 终端分类
     all = (0, "所有终端")
     pc = (1, "PC端")
-    wuxian = (1, "无线端")
+    wuxian = (2, "无线端")
 
     @classmethod
     def getNameFromValue(cls, val):

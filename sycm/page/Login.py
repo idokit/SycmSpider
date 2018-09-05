@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class Login(Base):
-    __baseUrl = 'https://sycm.taobao.com/portal/home.htm'
+    # __baseUrl = 'https://sycm.taobao.com/portal/home.htm'
+    __baseUrl = 'https://login.taobao.com/member/login.jhtml'
 
     __error_el = (By.CSS_SELECTOR, ".msg-err")
 
@@ -30,6 +31,8 @@ class Login(Base):
 
     def login(self):
         self.driver.get(self.__baseUrl)
+        # self.driver.maximize_window()
+        self.driver.set_window_size(1366, 768)
         try:
             self.script("document.querySelector('#J_Static2Quick').click()")
         except Exception as e:
@@ -38,7 +41,8 @@ class Login(Base):
         while 'https://sycm.taobao.com/portal/home.htm' not in self.driver.current_url:
             logger.info('登陆中')
             if 'https://mai.taobao.com/seller_admin.htm' in self.driver.current_url:
-                self.script("window.location.replace('https://sycm.taobao.com/portal/home.htm')")
+                self.script(
+                    "window.location.replace('https://sycm.taobao.com/portal/home.htm')")
             if count % 30 == 0:
                 try:
                     self.__qrcode_process()
@@ -101,5 +105,4 @@ class Login(Base):
     def parse_page(self):
         raise NotImplementedError
 
-    # def data_process(self):
-    #     raise NotImplementedError
+

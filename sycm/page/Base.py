@@ -17,10 +17,11 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
-    def __init__(self, driver, request=None,db=None,**kwargs):
+    def __init__(self, driver, request=None,db=None, cates=None,**kwargs):
         self.driver = driver
         self.request = request
         self.db = db
+        self.cates = cates
 
     def on_page(self, pagetitle):
         return pagetitle in self.driver.title

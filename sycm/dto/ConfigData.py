@@ -3,23 +3,24 @@ from sycm.entity.SycmCategory import SycmCategory
 from sycm.entity.TaskProgress import TaskProgress
 from sycm.exception.fieldDontMatchException import FieldDontMatchException
 from sycm.customEnums.formEnum import ShopType, DateType, DeviceType
-from .Dto import Dto
+from sycm.dto.Dto import Dto
 import logging
 import json
 import datetime
 
-dataConfig_logger = logging.getLogger("数据库配置")
+logger = logging.getLogger("数据库配置")
 
-
-# from customEnum.formEnum import DateType
 
 class ConfigData(object):
     __sql_address__ = "mysql+mysqlconnector://py_sycm:Kdi*33lSI@120.55.113.9:3306/toothpick"
 
     __name_lit__ = ('美容护肤/美体/精油', '彩妆/香水/美妆工具')
 
-    def __init__(self):
-        pass
+    def get_all(self):
+        session = Dto(self.__sql_address__)
+        cates = session.query(SycmCategory).all()
+        session.close()
+        return cates
 
     def updateDate_where_data_type(self, data_type, time_dimension, current_date):
         session = Dto(self.__sql_address__)
@@ -27,13 +28,12 @@ class ConfigData(object):
             session.query(TaskProgress).filter(
                 TaskProgress.data_type == data_type, TaskProgress.time_dimension == time_dimension).update(
                 {
-                    # TaskProgress.next_time: current_date
                     TaskProgress.next_time: datetime.datetime.strptime(current_date, "%Y-%m-%d")
                 }
             )
             session.commit()
         except Exception as e:
-            dataConfig_logger.error("进度更新失败：类型： %s 时间维度 %s 日期进度：%s" % (
+            logger.error("进度更新失败：类型： %s 时间维度 %s 日期进度：%s" % (
                 data_type, time_dimension, current_date) + str(e))
         finally:
             session.close()
@@ -46,7 +46,7 @@ class ConfigData(object):
             task_progress = session.query(TaskProgress).filter(
                 TaskProgress.data_type == data_type, TaskProgress.time_dimension == time_dimension).one()
         except Exception as e:
-            dataConfig_logger.error('数据库未查询到%s and %s' %
+            logger.error('数据库未查询到%s and %s' %
                                     (data_type, time_dimension) + str(e))
         return task_progress
 
@@ -72,7 +72,7 @@ class ConfigData(object):
                     category_detail = session.query(SycmCategory).filter(
                         SycmCategory.level == 1, SycmCategory.name == itemName).one()
                 except Exception as e:
-                    dataConfig_logger.error("通过类目名%s获取id失败%s" % (
+                    logger.error("通过类目名%s获取id失败%s" % (
                         itemName, category_detail.id) + str(e))
 
                 if data_type == '商品店铺榜-品牌粒度':
@@ -119,7 +119,7 @@ class ConfigData(object):
                                 'shopName': conf.shop
                             }
                     except Exception as e:
-                        dataConfig_logger.error("通过品牌名%s获取id失败%s" % (
+                        logger.error("通过品牌名%s获取id失败%s" % (
                             itemName, category_detail.id) + str(e))
                     cate_chain['depth'] = 2
                 if cate['三级类目'] != "":
@@ -147,12 +147,13 @@ class ConfigData(object):
                                 'shopName': conf.shop
                             }
                     except Exception as e:
-                        dataConfig_logger.error("通过品牌名%s获取id失败%s" % (
+                        logger.error("通过品牌名%s获取id失败%s" % (
                             itemName, category_detail.id) + str(e))
                     cate_chain['depth'] = 3
                 chain_list.append(cate_chain)
                 session.close()
         return chain_list
+
 
     def getFullCate(self, needJunjor=True, seniorName=('美容护肤/美体/精油', '彩妆/香水/美妆工具')):
         session = Dto(self.__sql_address__)
@@ -162,43 +163,15 @@ class ConfigData(object):
         )
         chain = list()
         for cate in conf_list:
-            chain.append({
-                'itemName': cate.name,
-                'cateId': cate.id,
-                'depth': 1
-            })
+            chain.append(cate.id)
             subcates = session.query(SycmCategory).filter(SycmCategory.parent_id == cate.id)
             for subcate in subcates:
-                chain.append(
-                    {
-                        'itemName': cate.name,
-                        'cateId': cate.id,
-                        'depth': 2,
-                        'subcate': {
-                            'itemName': subcate.name,
-                            'cateId': subcate.id
-                        }
-                    }
-                )
+                chain.append(subcate.id)
                 if needJunjor:
                     juniorCates = session.query(SycmCategory).filter(SycmCategory.parent_id == subcate.id).all()
                     if len(juniorCates) != 0:
                         for juniorCate in juniorCates:
-                            chain.append(
-                                {
-                                    'itemName': cate.name,
-                                    'cateId': cate.id,
-                                    'depth': 3,
-                                    'subcate': {
-                                        'itemName': subcate.name,
-                                        'cateId': subcate.id,
-                                        'subcate': {
-                                            'itemName': juniorCate.name,
-                                            'cateId': juniorCate.id,
-                                        }
-                                    }
-                                }
-                            )
+                            chain.append(juniorCate.id)
         return chain
 
     # 获取搜索词
@@ -216,47 +189,44 @@ class ConfigData(object):
             val = val + common_tb
             yield val
 
-    @staticmethod
-    def getCateId(selection):
-        if not selection['depth']:
-            dataConfig_logger.error("获取depth字段失败" + str(selection))
-            return
-        if selection['depth'] == 1:
-            return selection['cateId']
-        elif selection['depth'] == 2:
-            return selection['subcate']['cateId']
-        elif selection['depth'] == 3:
-            return selection['subcate']['subcate']['cateId']
-        else:
-            return None
 
     @staticmethod
-    def cateField(*, cate, start_time,end_time, dateType, devcice, seller, **kwarg):
+    def cateField(all_cates, cateId, start_time, end_time, dateType, devcice, seller, **kwarg):
+        cateId = int(cateId)
+        devcice = int(devcice)
+        seller = int(seller)
         cate_filed_tr = []
         cate_filed_tb = []
         data_key = []
-        if not cate['itemName']:
-            dataConfig_logger.error("获取字段名失败" + str(cate))
-            return None
-        cate_filed_tr.append('一级类目')
-        data_key.append(DateType[dateType].value)
-        data_key.append(cate['itemName'])
-        cate_filed_tb.append(cate['itemName'])
-        if cate['depth'] > 1:
-            cate_filed_tr.append('二级类目')
-            cate_filed_tb.append(cate['subcate']['itemName'])
-            data_key.append(cate['subcate']['itemName'])
-        if cate['depth'] > 2:
-            cate_filed_tr.append('三级类目')
-            cate_filed_tb.append(cate['subcate']['subcate']['itemName'])
-            data_key.append(cate['subcate']['subcate']['itemName'])
+        cate_name_list = []
+        count = 0
+        while True:
+            [current_cate] = filter(lambda v: v.id == cateId, all_cates)
+            cate_name_list.insert(0, current_cate.name)
+            parent_id = current_cate.parent_id
+            cateId = parent_id
+            count = count + 1
+            if parent_id == 0 or count > 3:
+                break
+
+        for i,name in enumerate(cate_name_list):
+            if i == 0:
+                cate_filed_tr.append('一级类目')
+            elif i == 1:
+                cate_filed_tr.append('二级类目')
+            else:
+                cate_filed_tr.append('三级类目')
+            cate_filed_tb.append(name)
+            data_key.append(name)
+
         cate_filed_tr.append('类目层级')
-        if cate['depth'] == 1:
+        if len(cate_name_list) == 1:
             cate_filed_tb.append('一级')
-        if cate['depth'] == 2:
+        elif len(cate_name_list) == 2:
             cate_filed_tb.append('二级')
-        if cate['depth'] == 3:
+        else:
             cate_filed_tb.append('三级')
+
         cate_filed_tr.append('开始日期')
         cate_filed_tr.append('结束日期')
         cate_filed_tr.append('周期')
@@ -267,9 +237,14 @@ class ConfigData(object):
         cate_filed_tb.append(DateType[dateType].value)
         cate_filed_tb.append(DeviceType.getNameFromValue(devcice))
         cate_filed_tb.append(ShopType.getNameFromValue(seller))
+        data_key.append(DateType[dateType].value)
         data_key.append(DeviceType.getNameFromValue(devcice))
         data_key.append(ShopType.getNameFromValue(seller))
 
         if len(cate_filed_tr) != len(cate_filed_tb):
             raise FieldDontMatchException(cate_filed_tr, cate_filed_tb)
         return cate_filed_tr, cate_filed_tb, data_key
+
+
+['一级类目', '二级类目', '类目层级', '开始日期', '结束日期', '周期', '终端', '店铺类型']
+['美容护肤/美体/精油', '其他保养', '二级', '2018-09-04', '2018-09-04', '天', '所有终端', '全网', '天']
