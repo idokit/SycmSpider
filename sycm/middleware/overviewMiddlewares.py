@@ -39,7 +39,6 @@ class OverviewMiddlewares(object):
             page.parse_page()
         else:
             logger.error('url无法找到对应的处理页面' + request.url)
-        raise Exception('error error error error error')
 
         return HtmlResponse(url=request.url, encoding="UTF-8",
                             request=request)
