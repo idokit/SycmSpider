@@ -5,7 +5,7 @@ import time
 from selenium.webdriver.common.by import By
 
 from sycm.dto.ConfigData import ConfigData
-from sycm.lib.handle import handle
+from sycm.util.handle import handle
 from sycm.page.Base import Base
 import logging
 

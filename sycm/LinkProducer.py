@@ -3,7 +3,7 @@ import datetime
 import re
 
 from sycm.dto.ConfigData import ConfigData
-from sycm.lib.RedisClient import RedisClient
+from sycm.util.RedisClient import RedisClient
 import pandas as pd
 
 
