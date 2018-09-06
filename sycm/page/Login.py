@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class Login(Base):
-    # __baseUrl = 'https://sycm.taobao.com/portal/home.htm'
-    __baseUrl = 'https://login.taobao.com/member/login.jhtml'
+    __baseUrl = 'https://sycm.taobao.com/portal/home.htm'
+    # __baseUrl = 'https://login.taobao.com/member/login.jhtml'
 
     __error_el = (By.CSS_SELECTOR, ".msg-err")
 
@@ -67,7 +67,7 @@ class Login(Base):
 
     def __get_error_el(self):
         try:
-            self.quick_find_element(*self.__error_el)
+            self.find_visible_element(*self.__error_el)
             return True
         except Exception as e:
             logger.info(e)
@@ -104,5 +104,3 @@ class Login(Base):
 
     def parse_page(self):
         raise NotImplementedError
-
-

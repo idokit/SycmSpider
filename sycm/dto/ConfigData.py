@@ -1,7 +1,7 @@
 from sycm.entity.UserParams import UserParams
 from sycm.entity.SycmCategory import SycmCategory
 from sycm.entity.TaskProgress import TaskProgress
-from sycm.exception.fieldDontMatchException import FieldDontMatchException
+from sycm.exception.error import FieldDontMatchException
 from sycm.customEnums.formEnum import ShopType, DateType, DeviceType
 from sycm.dto.Dto import Dto
 import logging
@@ -245,6 +245,3 @@ class ConfigData(object):
             raise FieldDontMatchException(cate_filed_tr, cate_filed_tb)
         return cate_filed_tr, cate_filed_tb, data_key
 
-
-['一级类目', '二级类目', '类目层级', '开始日期', '结束日期', '周期', '终端', '店铺类型']
-['美容护肤/美体/精油', '其他保养', '二级', '2018-09-04', '2018-09-04', '天', '所有终端', '全网', '天']

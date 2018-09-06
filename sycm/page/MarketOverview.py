@@ -5,6 +5,7 @@ import time
 from selenium.webdriver.common.by import By
 
 from sycm.dto.ConfigData import ConfigData
+from sycm.lib.handle import handle
 from sycm.page.Base import Base
 import logging
 
@@ -36,14 +37,14 @@ class Page(Base):
     def get_bottom(self):
         self.script("window.scroll(0,%r-window.innerHeight)" % self.find_element(*self.bottom).location["y"])
 
+    @handle
     def parse_page(self):
         self.driver.get(self.request.url)
         self.driver.refresh()
         time.sleep(2)
-        # self.request.url
-        re.compile()
         [(cateId, start_time, end_time, dateType, devcice, seller)] = self.re_partern.findall(self.request.url)
-        common_tr, common_tb, data_key = ConfigData.cateField(cateId, start_time, end_time, dateType, devcice, seller)
+        print(self.re_partern.findall(self.driver.current_url))
+        common_tr, common_tb, data_key = ConfigData.cateField(self.cates,cateId, start_time, end_time, dateType, devcice, seller)
         cate_trend_tr = list(map(lambda v: v.text, self.find_elements(*self.cate_trend_tr_s)))
         cate_trend_tb = list(map(lambda v: v.text, self.find_elements(*self.cate_trend_tb_s)))
         while True:
@@ -65,7 +66,7 @@ class Page(Base):
         value = json.dumps(dict(zip(cate_trend_tr + common_tr, cate_trend_tb + common_tb))
                            , ensure_ascii=False)
         logger.info(value)
-        self.db.data_process('店铺名', '市场-市场大盘-行业趋势', data_key + [cate_trend_tb[0]], value, '生意参谋',
+        self.db.data_process('宝洁官方旗舰店', '市场-市场大盘-行业趋势', data_key + [cate_trend_tb[0]], value, '生意参谋',
                              self.request.meta['start_time'], self.request.meta['end_time'])
 
         for table in self.total_table:

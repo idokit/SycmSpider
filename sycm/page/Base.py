@@ -11,13 +11,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import logging
+from sycm.exception.error import LackOfDataException, SycmBusyException, SessionExpiredException
 
 logger = logging.getLogger(__name__)
 
 
 class Base(object):
 
-    def __init__(self, driver, request=None,db=None, cates=None,**kwargs):
+    def __init__(self, driver, request=None, db=None, cates=None, **kwargs):
         self.driver = driver
         self.request = request
         self.db = db
@@ -34,6 +35,16 @@ class Base(object):
             return ele
         except TimeoutError as e:
             logger.error(u"%s 页面中未能找到 %s 元素" % (self, loc))
+            raise e
+
+    def find_visible_element(self, *loc):
+        try:
+            ele = WebDriverWait(self.driver, 2).until(
+                EC._element_if_visible(loc)
+            )
+            return ele
+        except TimeoutError as e:
+            logger.info('元素不可见' + str(loc))
             raise e
 
     def quick_find_element(self, *loc):
@@ -92,21 +103,22 @@ class Base(object):
             logger.error(u"%s 页面中未能找到 %s 元素" % (self, loc))
             raise e
 
-    def session_expired(self):
-        try:
-            ele = self.find_element(By.CSS_SELECTOR, ".ui-message-error .ui-message-content")
-            if ele.text == "亲，您的登录信息已过期，请重新登录。":
-                return True
-            else:
-                print(ele.text)
-                return False
-        except TimeoutError as e:
-            logger.info(e)
-            return False
-
     def get_cookie(self):
         if self.driver.get_cookies():
             return [item["name"] + "=" + item["value"] for item in self.driver.get_cookies()]
         else:
             logger.info('未获取到cookie')
             return None
+
+    def check_error(self):
+        if "https://login.taobao.com/member/login" in self.driver.current_url:
+            raise SessionExpiredException(url=self.driver.current_url)
+        try:
+            ele = self.find_element(By.CSS_SELECTOR, ".oui-dt-message-content")
+            if "数据为空" in ele.text:
+                raise LackOfDataException(url=self.driver.current_url)
+            elif "服务器繁忙" in ele.text:
+                raise SycmBusyException(url=self.driver.current_url)
+        except TimeoutError as e:
+            logger.info(e)
+            raise e

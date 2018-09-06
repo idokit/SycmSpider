@@ -18,15 +18,13 @@ class OverviewMiddlewares(object):
     def __init__(self, *args, **kwargs):
         options = webdriver.ChromeOptions()
         options.add_argument(r"user-data-dir=C:\Users\zhouyi\AppData\Local\Google\Chrome\User Data")
-        # options.add_argument(r"user-data-dir=C:\Users\pc\AppData\Local\Google\Chrome\User Data")
+        options.add_argument(r"user-data-dir=C:\Users\pc\AppData\Local\Google\Chrome\User Data")
         # options.add_argument('--headless')
         # options.add_argument('--disable-gpu')
-        # driver = webdriver.Chrome(r"C:\crawl\chromedriver", 0, options)
-        # self.driver = Login(driver=driver).login()
-        # self.db = Dto("mysql+mysqlconnector://root:123456@localhost:3306/test")
+        driver = webdriver.Chrome(r"C:\crawl\chromedriver", 0, options)
+        self.driver = Login(driver=driver).login()
+        self.db = Dto("mysql+mysqlconnector://root:123456@localhost:3306/test")
         self.cates = ConfigData().get_all()
-        self.re_reg = re.compile(
-            r"cateId=(.*?)&dateRange=(\d{4}-\d{2}-\d{2})%7c(\d{4}-\d{2}-\d{2})&dateType=(.*?)&device=(.*?)&sellerType=(.*?)$")
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -35,12 +33,14 @@ class OverviewMiddlewares(object):
         return s
 
     def process_request(self, request, spider):
-        # if True:
-        #     Page = importlib.import_module('sycm.page.MarketOverview').Page
-        # page = Page(driver=self.driver, request=request, db=self.db,cates = self.cates)
-        # page.parse_page()
-        [(cate, start_time, end_time, dateType, devcice, seller)] = self.re_reg.findall(request.url)
-        print(ConfigData.cateField(self.cates, cate, start_time, end_time, dateType, devcice, seller))
+        if request.url.startswith('https://sycm.taobao.com/mc/mq/overview'):
+            Page = importlib.import_module('sycm.page.MarketOverview').Page
+            page = Page(driver=self.driver, request=request, db=self.db, cates=self.cates)
+            page.parse_page()
+        else:
+            logger.error('url无法找到对应的处理页面' + request.url)
+        raise Exception('error error error error error')
+
         return HtmlResponse(url=request.url, encoding="UTF-8",
                             request=request)
 
@@ -48,7 +48,6 @@ class OverviewMiddlewares(object):
         return response
 
     def process_exception(self, request, exception, spider):
-        logger.error('处理异常')
         pass
 
     def spider_opened(self, spider):
