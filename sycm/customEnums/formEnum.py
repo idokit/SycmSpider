@@ -4,7 +4,7 @@ from enum import Enum
 class ShopType(Enum):
     # 店铺分类
     quanwang = (-1, "全网")
-    taobao = (-1, "淘宝")
+    taobao = (0, "淘宝")
     tianmao = (1, "天猫")
 
     @classmethod

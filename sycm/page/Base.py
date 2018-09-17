@@ -7,6 +7,9 @@ Project:基础类BasePage，封装所有页面都公用的方法，
 在初始化方法中定义驱动driver，基本url，title
 WebDriverWait提供了显式等待方式。
 '''
+import json
+
+import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -23,6 +26,17 @@ class Base(object):
         self.request = request
         self.db = db
         self.cates = cates
+
+
+    headers = {
+        'Connection': 'keep-alive',
+        'Cache-Control': 'max-age=0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.8'
+    }
 
     def on_page(self, pagetitle):
         return pagetitle in self.driver.title
@@ -102,13 +116,6 @@ class Base(object):
         except Exception as e:
             logger.error(u"%s 页面中未能找到 %s 元素" % (self, loc))
             raise e
-
-    def get_cookie(self):
-        if self.driver.get_cookies():
-            return [item["name"] + "=" + item["value"] for item in self.driver.get_cookies()]
-        else:
-            logger.info('未获取到cookie')
-            return None
 
     def check_error(self):
         if "https://login.taobao.com/member/login" in self.driver.current_url:

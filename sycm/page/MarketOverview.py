@@ -41,6 +41,7 @@ class Page(Base):
     def parse_page(self):
         self.driver.get(self.request.url)
         self.driver.refresh()
+        self.get_cookie()
         time.sleep(2)
         [(cateId, start_time, end_time, dateType, devcice, seller)] = self.re_partern.findall(self.request.url)
         print(self.re_partern.findall(self.driver.current_url))
@@ -67,7 +68,7 @@ class Page(Base):
                            , ensure_ascii=False)
         logger.info(value)
         self.db.data_process('宝洁官方旗舰店', '市场-市场大盘-行业趋势', data_key + [cate_trend_tb[0]], value, '生意参谋',
-                             self.request.meta['start_time'], self.request.meta['end_time'])
+                             start_time, end_time)
 
         for table in self.total_table:
             try:
@@ -76,15 +77,15 @@ class Page(Base):
                 logger.info(e)
                 continue
 
-            self.process(table, common_tb, common_tr, data_key)
+            self.process(table, common_tb, common_tr, data_key,start_time,end_time)
             total = self.find_elements(By.CSS_SELECTOR, self.total_s.format(table[0]))
             total = int(total[len(total) - 2].text)
             while total > 1:
                 self.click_item(By.CSS_SELECTOR, self.next_page_s.format(table[0]))
-                self.process(table, common_tb, common_tr, data_key)
+                self.process(table, common_tb, common_tr, data_key,start_time,end_time)
                 total = total - 1
 
-    def process(self, table, common_tb, common_tr, data_key):
+    def process(self, table, common_tb, common_tr, data_key,start_time,end_time):
         tr = self.find_elements(By.CSS_SELECTOR, self.tr_s.format(table[0]))
         tb = self.find_elements(By.CSS_SELECTOR, self.tb_s.format(table[0]))
         tb = [tb[i:i + len(tr)] for i in range(0, len(tb), len(tr))]
@@ -93,4 +94,4 @@ class Page(Base):
             tb_val = list(map(lambda v: v.text.split('\n')[0] or v.text, tb_item))
             value = json.dumps(dict(zip(key, tb_val + common_tb)), ensure_ascii=False)
             self.db.data_process('宝洁官方旗舰店', table[1], data_key + [tb_val[0]], value, '生意参谋',
-                                 self.request.meta['start_time'], self.request.meta['end_time'])
+                                 start_time, end_time)

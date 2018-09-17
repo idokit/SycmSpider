@@ -22,8 +22,7 @@ def main():
             # 判断开始时间是不是星期一
             current_week = start_time.isoweekday()
             if current_week != 1:
-                monday = start_time + datetime.timedelta(
-                    days=7 - current_week)
+                monday = start_time + datetime.timedelta(days=7 - current_week)
                 # 如果当前这个星期一距离现在不足7天
                 crawl_dates = [[i.strftime('%Y-%m-%d'), (i + datetime.timedelta(days=6)).strftime('%Y-%m-%d')] for i
                                in pd.date_range(monday, yesterday, freq='7D').date if (yesterday - i).days > 7]

@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
-import datetime
-
-import scrapy
-from scrapy.xlib.pydispatch import dispatcher
-from scrapy import Request, signals
+from scrapy import Spider, Request
 from scrapy_redis.spiders import RedisSpider
 
-from sycm.dto.ConfigData import ConfigData
-from sycm.dto.Dto import Dto
 
-
-class CompeletionSpider(RedisSpider):
+class CompeletionSpider(Spider):
     name = 'compeletion'
 
     def __init__(self, *args, **kwargs):
         super(CompeletionSpider, self).__init__(*args, **kwargs)
-        dispatcher.connect(self.closeSpider, signals.spider_closed)
+
+    def start_requests(self):
+        yield Request(url="https://sycm.taobao.com/ucc/mc/notify/listNotify.json?groupCode=one_plat",callback=self.parse)
 
 
     def parse(self, response):
+        print(response.text)
         pass
 
     def closeSpider(self, spider):

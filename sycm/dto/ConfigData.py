@@ -47,7 +47,7 @@ class ConfigData(object):
                 TaskProgress.data_type == data_type, TaskProgress.time_dimension == time_dimension).one()
         except Exception as e:
             logger.error('数据库未查询到%s and %s' %
-                                    (data_type, time_dimension) + str(e))
+                         (data_type, time_dimension) + str(e))
         return task_progress
 
     def new_band_config(self):
@@ -154,7 +154,6 @@ class ConfigData(object):
                 session.close()
         return chain_list
 
-
     def getFullCate(self, needJunjor=True, seniorName=('美容护肤/美体/精油', '彩妆/香水/美妆工具')):
         session = Dto(self.__sql_address__)
 
@@ -162,12 +161,13 @@ class ConfigData(object):
             SycmCategory.name.in_(seniorName)
         )
         chain = list()
+
         for cate in conf_list:
             chain.append(cate.id)
-            subcates = session.query(SycmCategory).filter(SycmCategory.parent_id == cate.id)
-            for subcate in subcates:
-                chain.append(subcate.id)
-                if needJunjor:
+            if needJunjor:
+                subcates = session.query(SycmCategory).filter(SycmCategory.parent_id == cate.id)
+                for subcate in subcates:
+                    chain.append(subcate.id)
                     juniorCates = session.query(SycmCategory).filter(SycmCategory.parent_id == subcate.id).all()
                     if len(juniorCates) != 0:
                         for juniorCate in juniorCates:
@@ -189,7 +189,6 @@ class ConfigData(object):
             val = val + common_tb
             yield val
 
-
     @staticmethod
     def cateField(all_cates, cateId, start_time, end_time, dateType, devcice, seller, **kwarg):
         cateId = int(cateId)
@@ -209,7 +208,7 @@ class ConfigData(object):
             if parent_id == 0 or count > 3:
                 break
 
-        for i,name in enumerate(cate_name_list):
+        for i, name in enumerate(cate_name_list):
             if i == 0:
                 cate_filed_tr.append('一级类目')
             elif i == 1:
@@ -244,4 +243,3 @@ class ConfigData(object):
         if len(cate_filed_tr) != len(cate_filed_tb):
             raise FieldDontMatchException(cate_filed_tr, cate_filed_tb)
         return cate_filed_tr, cate_filed_tb, data_key
-

@@ -45,12 +45,14 @@ class Login(Base):
                     "window.location.replace('https://sycm.taobao.com/portal/home.htm')")
             if count % 30 == 0:
                 try:
-                    self.__qrcode_process()
+                    # self.__qrcode_process()
+                    print('=============')
                 except Exception as e:
                     logger.error(e)
             else:
                 time.sleep(10)
             count += 1
+        logger.info('登录成功')
         self.__find_dialog()
         time.sleep(1)
         return self.driver
