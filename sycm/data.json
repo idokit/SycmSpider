@@ -1,90 +1,75 @@
 [{
-"rankNo": 1,
-"brandPicUrl": "TB1paG.w4uTBuNkHFNRwu39qpXa.png",
-"tradeIndexPercent": -0.0705,
-"pvIndex": 156630,
-"tradeIndex": 240162,
-"brandId": "82492215",
-"brandName": "Elta MD",
-"categoryId": 0,
-"payOrderAmt": 1385659.49,
-"payOrderAmtPre": 1490745.93,
-"payByrRate": 0.0609,
-"payItemCnt": 999,
-"days": 1
+"indexCode": "addCartCnt",
+"syncValueRate": 0.1488638682,
+"currentValue": 119505502
 },
 {
-"rankNo": 2,
-"brandPicUrl": "TB1JuYaKXXXXXcpXVXXSutbFXXX.jpg",
-"tradeIndexPercent": -0.1355,
-"pvIndex": 117786,
-"tradeIndex": 215296,
-"brandId": "3309062",
-"brandName": "Freeplus/芙丽芳丝",
-"categoryId": 0,
-"payOrderAmt": 1144331.99,
-"payOrderAmtPre": 1323624.86,
-"payByrRate": 0.0763,
-"payItemCnt": 1120,
-"days": 1
+"indexCode": "uv",
+"syncValueRate": 0.1062610694,
+"currentValue": 345890343
 },
 {
-"rankNo": 3,
-"brandPicUrl": "TB1f9zId8DH8KJjSszcXXbDTFXa",
-"tradeIndexPercent": 91.5298,
-"pvIndex": 71635,
-"tradeIndex": 116098,
-"brandId": "3294930",
-"brandName": "Miss face",
-"categoryId": 0,
-"payOrderAmt": 390633.15,
-"payOrderAmtPre": 4221.7,
-"payByrRate": 0.2599,
-"payItemCnt": 5,
-"days": 1
+"indexCode": "addCartBuyerCnt",
+"syncValueRate": 0.1195388387,
+"currentValue": 67282353
 },
 {
-"rankNo": 4,
-"brandPicUrl": "TB1XmddKFXXXXbyXVXXwu0bFXXX.png",
-"tradeIndexPercent": 1,
-"pvIndex": 18,
-"tradeIndex": 116002,
-"brandId": "530302023",
-"brandName": "CHERE ZOE/佐薇",
-"categoryId": 0,
-"payOrderAmt": 390075,
-"payOrderAmtPre": 0,
-"payByrRate": 0.1667,
-"payItemCnt": 1,
-"days": 1
+"indexCode": "payItemQty",
+"syncValueRate": 0.1189657169,
+"currentValue": 54082227
 },
 {
-"rankNo": 5,
-"brandPicUrl": "TB1dsKxFqSWBuNjSsrbXXa0mVXa",
-"tradeIndexPercent": -0.162,
-"pvIndex": 48071,
-"tradeIndex": 100425,
-"brandId": "2298030193",
-"brandName": "A.H.C/爱和纯",
-"categoryId": 0,
-"payOrderAmt": 304003.92,
-"payOrderAmtPre": 362776.88,
-"payByrRate": 0.0832,
-"payItemCnt": 459,
-"days": 1
+"indexCode": "pv",
+"syncValueRate": 0.1717212414,
+"currentValue": 2632162958
 },
 {
-"rankNo": 6,
-"brandPicUrl": "TB1M4MkufuSBuNkHFqDSutfhVXa.jpg",
-"tradeIndexPercent": 0.1071,
-"pvIndex": 55390,
-"tradeIndex": 97903,
-"brandId": "706814179",
-"brandName": "Beauty Buffet/美丽自助",
-"categoryId": 0,
-"payOrderAmt": 290949.46,
-"payOrderAmtPre": 262811.96,
-"payByrRate": 0.1138,
-"payItemCnt": 536,
-"days": 1
+"indexCode": "visitItemCnt",
+"syncValueRate": 0.0179688652,
+"currentValue": 5324591
+},
+{
+"indexCode": "searchClkRate",
+"syncValueRate": -0.0073058066,
+"currentValue": 0.3186457854
+},
+{
+"indexCode": "visitSellerCnt",
+"syncValueRate": 0.0119345808,
+"currentValue": 123624
+},
+{
+"indexCode": "searchUvCnt",
+"syncValueRate": 0.0981789399,
+"currentValue": 110216500
+},
+{
+"indexCode": "sellerCnt",
+"syncValueRate": 0.0141374944,
+"currentValue": 136940
+},
+{
+"indexCode": "paySellerCnt",
+"syncValueRate": 0.0206988649,
+"currentValue": 105478
+},
+{
+"indexCode": "favBuyerCnt",
+"syncValueRate": 0.1182641095,
+"currentValue": 23579055
+},
+{
+"indexCode": "searchPvCnt",
+"syncValueRate": 0.1090937983,
+"currentValue": 607941617
+},
+{
+"indexCode": "payPct",
+"syncValueRate": 0.098895215,
+"currentValue": 102.2990688899
+},
+{
+"indexCode": "favCnt",
+"syncValueRate": 0.1276084235,
+"currentValue": 37630307
 }]

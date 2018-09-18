@@ -174,6 +174,23 @@ class ConfigData(object):
                             chain.append(juniorCate.id)
         return chain
 
+
+    def getThridCate(self,seniorName=('美容护肤/美体/精油', '彩妆/香水/美妆工具')):
+        session = Dto(self.__sql_address__)
+
+        conf_list = session.query(SycmCategory).filter(
+            SycmCategory.name.in_(seniorName)
+        )
+        chain = list()
+        for cate in conf_list:
+            subcates = session.query(SycmCategory).filter(SycmCategory.parent_id == cate.id)
+            for subcate in subcates:
+                juniorCates = session.query(SycmCategory).filter(SycmCategory.parent_id == subcate.id).all()
+                if len(juniorCates) != 0:
+                    for juniorCate in juniorCates:
+                        chain.append(juniorCate.id)
+        return chain
+
     # 获取搜索词
     def get_searchwords(self, data_type):
         session = Dto(self.__sql_address__)
