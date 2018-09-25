@@ -25,7 +25,6 @@ class Rank(object):
 
     cates_items = ConfigData().get_all()
 
-
     @classmethod
     def run(cls):
         url = "https://sycm.taobao.com/mq/brand/rank.json?" \
@@ -57,8 +56,9 @@ class Rank(object):
 
     @classmethod
     def worker(cls, url):
-        (cateId, start_time,end_time, dateType, seller) = cls.re_partern.findall(url)[0]
-        commom_tr, common_tb, data_key = ConfigData.cateField(cls.cates_items, cateId, start_time,end_time,dateType, 0, seller)
+        (cateId, start_time, end_time, dateType, seller) = cls.re_partern.findall(url)[0]
+        commom_tr, common_tb, data_key = ConfigData.cateField(cls.cates_items, cateId, start_time, end_time, dateType,
+                                                              0, seller)
         time.sleep(3)
         data = []
         try:
@@ -67,6 +67,7 @@ class Rank(object):
             print(e)
         if data:
             cls.parse(data, commom_tr, common_tb, data_key, start_time, end_time)
+
     @classmethod
     def request(cls, new_url):
         rep = requests.get(new_url,
