@@ -43,16 +43,17 @@ class Rank(object):
 
     cates_items = ConfigData().get_all()
 
-
     @classmethod
     def run(cls):
         url = \
-            "https://sycm.taobao.com/mq/overview/reportIndex.json?cateId={cateId}&dateRange={start_time}%7C{end_time}&dateType={dateType}&device=0&indexCode=uv|pv|searchUvCnt|searchPvCnt|searchClkRate|favBuyerCnt|favCnt|addCartBuyerCnt|addCartCnt|payPct|visitItemCnt|sellerCnt|visitSellerCnt|paySellerCnt|payItemQty|searchIndex|tradeIndex|payAmtParentRate&seller={seller}"
+            "https://sycm.taobao.com/mq/overview/reportIndex.json?cateId={cateId}&" \
+            "dateRange={start_time}%7C{end_time}&dateType={dateType}&device=0&" \
+            "indexCode=uv|pv|searchUvCnt|searchPvCnt|searchClkRate|favBuyerCnt|favCnt|addCartBuyerCnt|" \
+            "addCartCnt|payPct|visitItemCnt|sellerCnt|visitSellerCnt|paySellerCnt|" \
+            "payItemQty|searchIndex|tradeIndex|payAmtParentRate&seller={seller}"
         cates = ConfigData().getFullCate()
-
-        print(cates)
         dateType = 'month'
-        sellers = [1,-1]
+        sellers = [1, -1]
         crawl_dates = [[datetime.date(v.year, v.month, 1).strftime('%Y-%m-%d'), v.strftime('%Y-%m-%d')] for v in
                        pd.date_range('2015-09-01', '2018-09-01', freq='1M').date]
         arr = []
@@ -77,7 +78,7 @@ class Rank(object):
                                                               0, seller)
         data = []
 
-        if  int(cateId) == 1801 or int(cateId) == 50010788:
+        if int(cateId) == 25 or int(cateId) == 124484008:
             url = "https://sycm.taobao.com/mq/overview/reportIndex.json?cateId={cateId}&dateRange={start_time}%7C{end_time}&dateType={dateType}&device=0&indexCode=uv|pv|searchUvCnt|searchPvCnt|searchClkRate|favBuyerCnt|favCnt|addCartBuyerCnt|addCartCnt|payPct|visitItemCnt|sellerCnt|visitSellerCnt|paySellerCnt|payItemQty&seller={seller}".format(
                 cateId=cateId,
                 start_time=start_time,
@@ -89,7 +90,7 @@ class Rank(object):
             data = cls.request(url)
         except Exception as e:
             print(e)
-        if len(data)!=0:
+        if len(data) != 0:
             cls.parse(data, commom_tr, common_tb, data_key, start_time, end_time)
 
     @classmethod
@@ -103,40 +104,50 @@ class Rank(object):
                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36',
                                'Accept-Encoding': 'gzip, deflate',
                                'Accept-Language': 'zh-CN,zh;q=0.8',
-                               'cookie': 'cookie2=19b3cf1a61b5e088b1f21ca683995e05; csg=471e903e'
+                               'cookie': 'cookie2=34c05924cf1d6c6e07660b3502afa9be; csg=d7ebd851'
                            })
         if rep.status_code == 200:
             rep_josn = json.loads(rep.text, encoding='utf-8')
             if rep_josn['hasError'] == False:
                 return rep_josn['content']['data']
         else:
-            print(rep.text)
+            # print(rep.text)
             return []
 
     @classmethod
     def parse(cls, data, common_tr, common_tb, data_key, start_time, end_time):
         tr = [ItenEnum[v['indexCode']].value for v in data]
-        tb = [v.get('currentValue',None) for v in data]
-        try:
-            json_str = json.dumps(dict(zip(tr + common_tr, tb + common_tb)), ensure_ascii=False)
-            cls.db.data_process(
-                '宝洁官方旗舰', '市场行情-行业大盘-行业报表', data_key + [start_time], json_str, '百雀羚旗舰店', start_time, end_time
-            )
-            print(json_str)
-        except Exception as e:
-            print(e)
+        tb = [v.get('currentValue', None) or v.get('values',[0])[-1] for v in data]
+        for tb_val in tb:
+            if tb_val:
+                try:
+                    json_str = json.dumps(dict(zip(tr + common_tr, tb + common_tb)), ensure_ascii=False)
+                    cls.db.data_process(
+                        'hasbro孩之宝旗舰店', '市场行情-行业大盘-行业报表', data_key + [start_time], json_str, '生意参谋', start_time, end_time
+                    )
+                    print(json_str)
+                    break
+                except Exception as e:
+                    print(e)
+
 
 if __name__ == '__main__':
-    urls = Rank.run()
-    time_start = time.time()
-    pool = Pool()  # 创建4个进程
-    pool.map(Rank.worker, urls)
-    pool.close()  # 关闭进程池，表示不能再往进程池中添加进程，需要在join之前调用
-    pool.join()
-
-    time_end = time.time()
-
-    print('totally cost', time_end - time_start)
-
-
+    # urls = Rank.run()
+    # # for url in urls:
+    # #     Rank.worker(url)
+    # #
+    # # time_start = time.time()
+    # pool = Pool()  # 创建4个进程
+    # pool.map(Rank.worker, urls)
+    # pool.close()  # 关闭进程池，表示不能再往进程池中添加进程，需要在join之前调用
+    # pool.join()
+    # time_end = time.time()
+    #              'https://sycm.taobao.com/mq/overview/reportTrend.json?cateId=25&dateRange=2015-09-01%7C2015-09-30&dateType=month&device=0&indexCode=uv|pv|searchUvCnt|searchPvCnt|searchClkRate|favBuyerCnt|favCnt|addCartBuyerCnt|addCartCnt|payPct|visitItemCnt|sellerCnt|visitSellerCnt|paySellerCnt|payItemQty&seller=-1'
+    # for url in urls:
+    # print(len(urls))
+    # print('totally cost', time_end - time_start)
+    while True:
+        rep = Rank.request('https://sycm.taobao.com/mq/overview/reportTrend.json?cateId=25&dateRange=2015-09-01%7C2015-09-30&dateType=month&device=0&indexCode=uv|pv|searchUvCnt|searchPvCnt|searchClkRate|favBuyerCnt|favCnt|addCartBuyerCnt|addCartCnt|payPct|visitItemCnt|sellerCnt|visitSellerCnt|paySellerCnt|payItemQty&seller=-1')
+        print(rep)
+        time.sleep(120)
 

@@ -2,6 +2,7 @@ import datetime
 import json
 import re
 import time
+from enum import Enum
 from multiprocessing import Pool
 
 import requests
@@ -13,13 +14,31 @@ from sycm.dto.Dto import Dto
 from multiprocessing import pool
 
 
+class ItenEnum(Enum):
+    uv = "访客数"
+    pv = "浏览量"
+    searchUvCnt = "搜索点击人数"
+    searchPvCnt = "搜索点击次数"
+    searchClkRate = "搜索点击率"
+    favBuyerCnt = "收藏人数"
+    favCnt = "收藏次数"
+    addCartBuyerCnt = "加购人数"
+    addCartCnt = "加购次数"
+    payPct = "客单价"
+    visitItemCnt = "浏览商品数"
+    sellerCnt = "卖家数"
+    visitSellerCnt = "被浏览卖家数"
+    paySellerCnt = "被支付卖家数"
+    payItemQty = "支付件数"
+    searchIndex = "搜索人气"
+    tradeIndex = "交易指数"
+    payAmtParentRate = "支付金额较父类目占比"
+
+
 class Rank(object):
-    tr = ['热销排名', '品牌名称', '交易指数', '交易增长幅度', '支付商品数', '支付转化率', '品牌ID']
-
-    item = ['rankNo', 'brandName', 'tradeIndex', 'tradeIndexPercent', 'payItemCnt', 'payByrRate', 'brandId']
-
     re_partern = re.compile(
-        r"cateId=(.*?)&dateRange=(\d{4}-\d{2}-\d{2})%7C(\d{4}-\d{2}-\d{2})&dateType=(.*?)&device=0&orderField=tradeIndex&orderType=desc&page=1&pageSize=10&rankType=0&search=&seller=(.*?)$")
+        r"cateId=(.*?)&dateRange=(\d{4}-\d{2}-\d{2})%7C(\d{4}-\d{2}-\d{2})&dateType=(.*?)&device=0&seller=(.*?)$")
+
 
     db = Dto(sql_address='mysql+mysqlconnector://py_sycm:Kdi*33lSI@120.55.113.9:3306/toothpick')
 
@@ -27,18 +46,12 @@ class Rank(object):
 
     @classmethod
     def run(cls):
-        url = "https://sycm.taobao.com/mq/brand/rank.json?" \
-              "cateId={cateId}&" \
-              "dateRange={start_time}%7C{end_time}&" \
-              "dateType={dateType}&device=0&orderField=tradeIndex&orderType=desc&page=1&pageSize=10&rankType=0&search=&seller={seller}"
-        # cate_name =('彩妆/香水/美妆工具')
+        url = "https://sycm.taobao.com/mq/overview/childCateRank.json?cateId=(.*?)&dateRange=(.*?)%7C(.*?)&dateType=(.*?)&device=0&seller=(.*?)"
         cates = ConfigData().getFullCate()
-
         dateType = 'month'
-        sellers = [-1, 0, 1]
+        sellers = [1, -1]
         crawl_dates = [[datetime.date(v.year, v.month, 1).strftime('%Y-%m-%d'), v.strftime('%Y-%m-%d')] for v in
-                       pd.date_range('2017-08-01', '2018-09-01', freq='1M').date]
-
+                       pd.date_range('2015-09-01', '2018-09-01', freq='1M').date]
         arr = []
         for cateId in cates:
             for crawl_date in crawl_dates:
@@ -59,13 +72,21 @@ class Rank(object):
         (cateId, start_time, end_time, dateType, seller) = cls.re_partern.findall(url)[0]
         commom_tr, common_tb, data_key = ConfigData.cateField(cls.cates_items, cateId, start_time, end_time, dateType,
                                                               0, seller)
-        time.sleep(3)
         data = []
+
+        if int(cateId) == 25 or int(cateId) == 124484008:
+            url = "https://sycm.taobao.com/mq/overview/reportIndex.json?cateId={cateId}&dateRange={start_time}%7C{end_time}&dateType={dateType}&device=0&indexCode=uv|pv|searchUvCnt|searchPvCnt|searchClkRate|favBuyerCnt|favCnt|addCartBuyerCnt|addCartCnt|payPct|visitItemCnt|sellerCnt|visitSellerCnt|paySellerCnt|payItemQty&seller={seller}".format(
+                cateId=cateId,
+                start_time=start_time,
+                end_time=end_time,
+                dateType=dateType,
+                seller=seller
+            )
         try:
             data = cls.request(url)
         except Exception as e:
             print(e)
-        if data:
+        if len(data) != 0:
             cls.parse(data, commom_tr, common_tb, data_key, start_time, end_time)
 
     @classmethod
@@ -84,39 +105,33 @@ class Rank(object):
         if rep.status_code == 200:
             rep_josn = json.loads(rep.text, encoding='utf-8')
             if rep_josn['hasError'] == False:
-                return rep_josn['content']['data']['data']
+                return rep_josn['content']['data']
         else:
             print(rep.text)
             return []
 
     @classmethod
     def parse(cls, data, common_tr, common_tb, data_key, start_time, end_time):
-        count = 0
-        for tbs in data:
-            count += 1
-            if count > 50:
-                break
-            tb = [tbs.get(key, None) for key in cls.item]
-            try:
-                json_str = json.dumps(dict(zip(cls.tr + common_tr, tb + common_tb)), ensure_ascii=False)
-                cls.db.data_process(
-                    'hasbro孩之宝旗舰店', '品牌分析-品牌排行-热销品牌榜', data_key + [str(tb[0])], json_str, '百雀羚旗舰店', start_time, end_time
-                )
-                print(json_str)
-            except Exception as e:
-                print(e)
+        tr = [ItenEnum[v['indexCode']].value for v in data]
+        tb = [v.get('currentValue', None) for v in data]
+        try:
+            json_str = json.dumps(dict(zip(tr + common_tr, tb + common_tb)), ensure_ascii=False)
+            cls.db.data_process(
+                'hasbro孩之宝旗舰店', '市场行情-行业大盘-行业报表', data_key + [start_time], json_str, '生意参谋', start_time, end_time
+            )
+            print(json_str)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
     urls = Rank.run()
-    pool = Pool()  # 创建4个进程
     time_start = time.time()
+    pool = Pool()  # 创建4个进程
     pool.map(Rank.worker, urls)
     pool.close()  # 关闭进程池，表示不能再往进程池中添加进程，需要在join之前调用
-    pool.join()  # 等待进程池中的所有进程执行完毕
-
-    # for i in urls:
-    #     Rank.worker(i)
+    pool.join()
     time_end = time.time()
-
-    print('totally cost', time_end - time_start)
+    # for url in urls:
+    # print(len(urls))
+    # print('totally cost', time_end - time_start)

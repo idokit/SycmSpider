@@ -154,7 +154,7 @@ class ConfigData(object):
                 session.close()
         return chain_list
 
-    def getFullCate(self, needJunjor=True, seniorName=('美容护肤/美体/精油', '彩妆/香水/美妆工具')):
+    def getFullCate(self, needJunjor=True, seniorName=('模玩/动漫/周边/cos/桌游', '玩具/童车/益智/积木/模型')):
         session = Dto(self.__sql_address__)
 
         conf_list = session.query(SycmCategory).filter(
@@ -174,8 +174,7 @@ class ConfigData(object):
                             chain.append(juniorCate.id)
         return chain
 
-
-    def getThridCate(self,seniorName=('美容护肤/美体/精油', '彩妆/香水/美妆工具')):
+    def getThridCate(self, seniorName=('美容护肤/美体/精油', '彩妆/香水/美妆工具')):
         session = Dto(self.__sql_address__)
 
         conf_list = session.query(SycmCategory).filter(

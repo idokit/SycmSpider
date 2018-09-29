@@ -28,11 +28,7 @@ def handle(func):
                 Info.send_info('{} message: {}'.format(self.driver.current_url, str(e)))
                 sys.exit()
             except Exception as e:
-                # Info.send_info('{} message: {}'.format(self.driver.current_url, str(e)))
                 logger.error(self.driver.current_url + str(e))
                 raise e1
-
-            # self.get_screenshot_as_file(
-            #     'img/%s.png' % str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')))
 
     return wrapper
